@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="792e01b1-fadc-4a10-8e1d-eb4020f515b3" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="99bfb13e-4ae0-4cf3-bcc6-590bfb13743b" >
+		<file:connection workingDir="L:\local\TestDirectory\read" />
+	</file:config>
+	<file:config name="File_Config1" doc:name="File Config" doc:id="afb22cb4-5806-48a2-a676-ccad084f241c" >
+		<file:connection workingDir="L:\local\TestDirectory\write" />
+	</file:config>
+	<flow name="file-cicdFlow" doc:id="dd5a3f00-0fd9-459a-8261-8e8f249cc734" >
+		<http:listener doc:name="Listener" doc:id="5a585eb1-87be-4097-8793-21096f9bb67d" config-ref="HTTP_Listener_config" path="/file"/>
+		<file:read doc:name="Read" doc:id="832a0df3-0567-4b76-a972-e0d656cac5b5" config-ref="File_Config" path="testFile4READ.txt"/>
+		<logger level="INFO" doc:name="Logger" doc:id="348e2f8f-35ea-4939-8805-69d1fb67060c" />
+		<file:write doc:name="Write" doc:id="fa3496d8-ee6d-4cb3-9a2a-b4873779517f" config-ref="File_Config1" path="testFile4WRITE.txt"/>
+		<ee:transform doc:name="Transform Message" doc:id="c01291bf-31d0-4ef5-a5c5-6f9c5efc7ebc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "File written successfully! /n\n",
+	"Result": payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
